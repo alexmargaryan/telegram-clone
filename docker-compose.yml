@@ -1,0 +1,15 @@
+volumes:
+  database:
+    driver: local
+
+services:
+  postgres:
+    image: postgres:17.5-alpine
+    volumes:
+      - database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: telegram-clone
+    ports:
+      - 5432:5432

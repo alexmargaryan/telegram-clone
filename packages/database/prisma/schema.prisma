@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ChatType {
+  PRIVATE
+  GROUP
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  GIF
+  FILE
+  CAMERA_PHOTO
+}
+
+// ─────────────────────── USERS & PROFILES ─────────────────────── //
+model User {
+  id           String    @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String    @unique
+  password     String
+  username     String?   @unique
+  avatarUrl    String?
+  role         Role      @default(USER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+  refreshToken String?
+
+  sentMessages Message[]         @relation("SenderMessages")
+  chatMembers  ChatMember[]
+  reactions    MessageReaction[]
+}
+
+// ─────────────────────── CHATS ─────────────────────── //
+model Chat {
+  id        String   @id @default(uuid())
+  type      ChatType @default(PRIVATE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+  members  ChatMember[]
+}
+
+model ChatMember {
+  id     String @id @default(uuid())
+  chatId String
+  userId String
+
+  chat Chat @relation(fields: [chatId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([chatId, userId])
+}
+
+// ─────────────────────── MESSAGES ─────────────────────── //
+model Message {
+  id               String      @id @default(uuid())
+  chatId           String
+  senderId         String
+  text             String?
+  type             MessageType @default(TEXT)
+  mediaUrl         String?
+  replyToMessageId String?
+  isDeleted        Boolean     @default(false)
+  isEdited         Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  chat            Chat      @relation(fields: [chatId], references: [id])
+  sender          User      @relation("SenderMessages", fields: [senderId], references: [id])
+  replyToMessage  Message?  @relation("ReplyTo", fields: [replyToMessageId], references: [id])
+  repliedMessages Message[] @relation("ReplyTo")
+
+  reactions MessageReaction[]
+
+  @@index([chatId, createdAt])
+  @@index([replyToMessageId])
+}
+
+// ─────────────────────── REACTIONS ─────────────────────── //
+model MessageReaction {
+  id        String   @id @default(uuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([messageId, userId, emoji])
+}
