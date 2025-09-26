@@ -3,8 +3,8 @@ import { ZodSerializerDto } from "nestjs-zod";
 import { CurrentUser } from "@/auth/decorators/current-user.decorator";
 import { RestrictTo } from "@/auth/decorators/roles.decorator";
 import { RolesGuard } from "@/auth/guards/roles.guard";
+import { ApiPaginatedResponse } from "@/common/decorators/swagger.decorators";
 import { UuidValidationPipe } from "@/pipes/uuid.pipe";
-import { Role } from "@telegram-clone/database";
 import {
   Controller,
   Get,
@@ -21,10 +21,11 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
 } from "@nestjs/swagger";
+import { Role } from "@telegram-clone/database";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { UserResponseDto } from "./dto/user.dto";
+import { UserResponseDto, UsersResponseDto } from "./dto/user.dto";
 import { UsersService } from "./users.service";
 
 @ApiBearerAuth()
@@ -51,8 +52,8 @@ export class UsersController {
   @Get()
   @RestrictTo(Role.ADMIN)
   @UseGuards(RolesGuard)
-  @ApiOkResponse({ type: UserResponseDto, isArray: true })
-  @ZodSerializerDto(UserResponseDto)
+  @ApiPaginatedResponse(UserResponseDto)
+  @ZodSerializerDto(UsersResponseDto)
   async findAll() {
     return this.usersService.findAll();
   }

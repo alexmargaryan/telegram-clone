@@ -11,6 +11,11 @@ export const PasswordSchema = z.string().regex(passwordRegex, {
     "Password must have at least 8 characters (1 uppercase, 1 lowercase, 1 number, and 1 special character)",
 });
 
+export const DateSchema = z.preprocess(
+  (val) => (val as Date).toISOString(),
+  z.string()
+);
+
 export const PaginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),

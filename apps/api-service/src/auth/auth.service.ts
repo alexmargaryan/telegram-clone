@@ -124,7 +124,6 @@ export class AuthService {
     const existingUser = await this.prismaService.user.findUnique({
       where: {
         email: parsedDto.email,
-        // continue from here
         deletedAt: null,
       },
     });
