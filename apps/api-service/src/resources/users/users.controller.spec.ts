@@ -1,5 +1,5 @@
-import { Role } from "@telegram-clone/database";
 import { Test, TestingModule } from "@nestjs/testing";
+import { Role } from "@telegram-clone/database";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";

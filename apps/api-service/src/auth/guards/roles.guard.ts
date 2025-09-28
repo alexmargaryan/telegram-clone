@@ -1,7 +1,7 @@
 import { ForbiddenException } from "@/common/errors";
-import { Role } from "@telegram-clone/database";
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
+import { Role } from "@telegram-clone/database";
 
 import { ROLES_KEY } from "../decorators/roles.decorator";
 

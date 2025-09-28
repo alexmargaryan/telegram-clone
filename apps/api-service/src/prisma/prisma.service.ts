@@ -1,5 +1,5 @@
-import { PrismaClient } from "@telegram-clone/database";
 import { Injectable, OnModuleInit } from "@nestjs/common";
+import { PrismaClient } from "@telegram-clone/database";
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
