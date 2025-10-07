@@ -50,8 +50,6 @@ export class UsersController {
   }
 
   @Get()
-  @RestrictTo(Role.ADMIN)
-  @UseGuards(RolesGuard)
   @ApiPaginatedResponse(UserResponseDto)
   @ZodSerializerDto(UsersResponseDto)
   async findAll() {
@@ -59,7 +57,6 @@ export class UsersController {
   }
 
   @Get(":id")
-  @UseGuards(RolesGuard)
   @ApiOkResponse({ type: UserResponseDto })
   @ZodSerializerDto(UserResponseDto)
   async findOne(@Param("id", UuidValidationPipe) id: string) {

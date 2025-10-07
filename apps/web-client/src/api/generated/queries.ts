@@ -37,7 +37,6 @@ import type {
   SigninDto,
   SignupDto,
   StartPrivateChatDto,
-  TokenDto,
   UpdateMessageDto,
   UpdateUserDto,
   UserResponseDto,
@@ -185,7 +184,7 @@ export const authControllerSignin = (
   signinDto: SigninDto,
   signal?: AbortSignal
 ) => {
-  return axiosInstance<TokenDto>({
+  return axiosInstance<void>({
     url: `/api/auth/signin`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -262,7 +261,7 @@ export const authControllerSignup = (
   signupDto: SignupDto,
   signal?: AbortSignal
 ) => {
-  return axiosInstance<TokenDto>({
+  return axiosInstance<void>({
     url: `/api/auth/signup`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -620,7 +619,7 @@ export function useAuthControllerGoogleCallback<
 }
 
 export const authControllerRefreshToken = (signal?: AbortSignal) => {
-  return axiosInstance<TokenDto>({
+  return axiosInstance<void>({
     url: `/api/auth/refresh`,
     method: "POST",
     signal,

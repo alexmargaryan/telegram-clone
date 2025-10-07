@@ -38,7 +38,6 @@ export * from "./paginatedDto";
 export * from "./signinDto";
 export * from "./signupDto";
 export * from "./startPrivateChatDto";
-export * from "./tokenDto";
 export * from "./updateMessageDto";
 export * from "./updateUserDto";
 export * from "./userResponseDto";

@@ -42,6 +42,10 @@ export class JwtTokenService {
     return this.generateToken(tokenPayload, options);
   }
 
+  public decodeToken(token: string): JwtPayload {
+    return this.jwtService.decode(token);
+  }
+
   private generateToken(payload: Record<string, any>, options: JwtSignOptions) {
     return this.jwtService.sign(payload, options);
   }

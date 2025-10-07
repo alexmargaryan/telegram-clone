@@ -1,37 +1,74 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 
 import { ApiConfigService } from "@/config/config.service";
-import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOkResponse } from "@nestjs/swagger";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
+import { ApiOkResponse } from "@nestjs/swagger";
 
 import { AuthService } from "./auth.service";
 import { CurrentUser } from "./decorators/current-user.decorator";
 import { Public } from "./decorators/public.decorator";
 import { SigninDto, SignupDto } from "./dto/signin.dto";
-import { TokenDto } from "./dto/token.dto";
 import { GoogleAuthGuard } from "./google/google-auth.guard";
-import { JwtAuthGuard } from "./jwt/jwt-auth.guard";
+import { JwtTokenService } from "./jwt-token/jwt-token.service";
 import { RefreshJwtAuthGuard } from "./jwt/refresh-jwt-auth.guard";
 
 @Controller("auth")
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly apiConfigService: ApiConfigService
+    private readonly apiConfigService: ApiConfigService,
+    private readonly jwtTokenService: JwtTokenService
   ) {}
 
   @Public()
   @Post("signin")
-  @ApiOkResponse({ type: TokenDto })
-  async signin(@Body() dto: SigninDto) {
-    return this.authService.signin(dto);
+  async signin(
+    @Body() dto: SigninDto,
+    @Res({ passthrough: true }) response: Response
+  ) {
+    const { accessToken, refreshToken } = await this.authService.signin(dto);
+
+    // TODO: create and use a function for setting a maxAge
+    response.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 1 * 60 * 1000, // 1 minute
+    });
+
+    response.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 5 * 60 * 1000, // 5 minutes
+    });
   }
 
   @Public()
   @Post("signup")
-  @ApiOkResponse({ type: TokenDto })
-  async signup(@Body() dto: SignupDto) {
-    return this.authService.signup(dto);
+  async signup(
+    @Body() dto: SignupDto,
+    @Res({ passthrough: true }) response: Response
+  ) {
+    const { accessToken, refreshToken } = await this.authService.signup(dto);
+
+    response.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 1 * 60 * 1000, // 1 minute
+    });
+
+    response.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 5 * 60 * 1000, // 5 minutes
+    });
   }
 
   @Public()
@@ -61,16 +98,44 @@ export class AuthController {
   @Public()
   @Post("refresh")
   @UseGuards(RefreshJwtAuthGuard)
-  @ApiOkResponse({ type: TokenDto })
-  async refreshToken(@CurrentUser("id") userId: string) {
-    return this.authService.refreshToken(userId);
+  async refreshToken(
+    @CurrentUser("id") userId: string,
+    @Res({ passthrough: true }) response: Response
+  ) {
+    const { accessToken, refreshToken } =
+      await this.authService.refreshToken(userId);
+
+    response.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 1 * 60 * 1000, // 1 minute
+    });
+
+    response.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 5 * 60 * 1000, // 5 minutes
+    });
   }
 
-  @ApiBearerAuth()
   @Post("logout")
-  @UseGuards(JwtAuthGuard)
   @ApiOkResponse()
-  async logout(@CurrentUser("id") userId: string) {
-    return this.authService.logOut(userId);
+  async logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response
+  ) {
+    response.clearCookie("accessToken");
+    response.clearCookie("refreshToken");
+
+    const refreshToken = request.cookies["refreshToken"] as string | undefined;
+
+    if (refreshToken) {
+      const decoded = this.jwtTokenService.decodeToken(refreshToken);
+      const userId = decoded.sub;
+      console.log("decoded ---->", decoded);
+      await this.authService.logOut(userId);
+    }
+
+    return { message: "Logged out successfully" };
   }
 }

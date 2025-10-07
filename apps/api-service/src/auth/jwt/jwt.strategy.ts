@@ -1,3 +1,4 @@
+import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 
 import { UnauthorizedException } from "@/common/errors";
@@ -16,7 +17,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly authService: AuthService
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        JwtStrategy.extractJwtFromCookie,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: apiConfigService.jwtPublicKey,
     });
@@ -34,5 +38,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     return user;
+  }
+
+  private static extractJwtFromCookie(req: Request): string | null {
+    return req?.cookies?.["accessToken"];
   }
 }

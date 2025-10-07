@@ -41,6 +41,16 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Custom semantic colors */
+  --color-description: var(--color-description);
+  --color-heading: var(--color-heading);
+  --color-label: var(--color-label);
+  --color-placeholder: var(--color-placeholder);
+  --color-border-light: var(--color-border-light);
+  --color-error: var(--color-error);
+  --color-error-bg: var(--color-error-bg);
+  --color-error-border: var(--color-error-border);
 }
 
 :root {
@@ -51,7 +61,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #0088cc;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -62,7 +72,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: #33aadd;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -76,6 +86,16 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Custom semantic color variables */
+  --color-description: #6b7280; /* gray-600 */
+  --color-heading: #111827; /* gray-900 */
+  --color-label: #374151; /* gray-700 */
+  --color-placeholder: #9ca3af; /* gray-400 */
+  --color-border-light: #d1d5db; /* gray-300 */
+  --color-error: #dc2626; /* red-600 */
+  --color-error-bg: #fef2f2; /* red-50 */
+  --color-error-border: #fecaca; /* red-200 */
 }
 
 .dark {
@@ -110,6 +130,16 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Custom semantic color variables for dark mode */
+  --color-description: #9ca3af; /* gray-400 */
+  --color-heading: #f9fafb; /* gray-50 */
+  --color-label: #d1d5db; /* gray-300 */
+  --color-placeholder: #6b7280; /* gray-500 */
+  --color-border-light: #374151; /* gray-700 */
+  --color-error: #f87171; /* red-400 */
+  --color-error-bg: #7f1d1d; /* red-900 */
+  --color-error-border: #991b1b; /* red-800 */
 }
 
 @layer base {
@@ -119,6 +149,7 @@
 
   body {
     @apply bg-background text-foreground;
+    color: var(--color-heading);
   }
 
   button:not([disabled]),

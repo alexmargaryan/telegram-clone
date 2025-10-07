@@ -1,3 +1,4 @@
+import * as cookieParser from "cookie-parser";
 import { patchNestJsSwagger } from "nestjs-zod";
 
 import { Logger } from "@nestjs/common";
@@ -20,6 +21,8 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter, app.get(Logger)));
 
+  app.use(cookieParser());
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle(swaggerOptions.title)
     .setDescription(swaggerOptions.description)
@@ -32,7 +35,7 @@ async function bootstrap() {
   const documentFactory = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("api/docs", app, documentFactory);
 
-  app.enableCors();
+  app.enableCors({ credentials: true, origin: config.webClientUrl });
 
   await app.listen(config.port, () => {
     console.log(`App is listening on port ${config.port}`);

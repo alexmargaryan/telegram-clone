@@ -20,7 +20,10 @@ export class RefreshJwtStrategy extends PassportStrategy(
     private readonly authService: AuthService
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        RefreshJwtStrategy.extractJwtFromCookie,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: apiConfigService.refreshJwtPublicKey,
       passReqToCallback: true,
@@ -32,7 +35,9 @@ export class RefreshJwtStrategy extends PassportStrategy(
       throw new UnauthorizedException(USER_CREDENTIALS_NOT_FOUND_ERROR_MESSAGE);
     }
 
-    const refreshToken = req.headers.authorization?.replace("Bearer ", "");
+    const refreshToken =
+      RefreshJwtStrategy.extractJwtFromCookie(req) ||
+      req.headers.authorization?.replace("Bearer ", "");
 
     if (!refreshToken) {
       throw new UnauthorizedException(USER_CREDENTIALS_NOT_FOUND_ERROR_MESSAGE);
@@ -44,5 +49,9 @@ export class RefreshJwtStrategy extends PassportStrategy(
     );
 
     return user;
+  }
+
+  private static extractJwtFromCookie(req: Request): string | null {
+    return req?.cookies?.["refreshToken"] || null;
   }
 }
