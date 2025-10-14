@@ -90,9 +90,20 @@ export class AuthController {
   ) {
     const response = await this.authService.googleLogin(userId);
 
-    res.redirect(
-      `${this.apiConfigService.webClientUrl}?token=${response.accessToken}&refreshToken=${response.refreshToken}`
-    );
+    // Set cookies instead of URL parameters
+    res.cookie("accessToken", response.accessToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 1 * 60 * 1000, // 1 minute
+    });
+
+    res.cookie("refreshToken", response.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 5 * 60 * 1000, // 5 minutes
+    });
+
+    res.redirect(this.apiConfigService.webClientUrl);
   }
 
   @Public()
