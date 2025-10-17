@@ -1,7 +1,7 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { ROUTES } from "@/lib/routes";
 
 export default function Home() {
-  return <Button onClick={() => console.log("clicked")}>Test</Button>;
+  redirect(ROUTES.CHATS);
 }

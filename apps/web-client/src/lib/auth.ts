@@ -4,7 +4,7 @@
 import { ROUTES } from "./routes";
 
 export const AUTH_ROUTES = [ROUTES.SIGNIN, ROUTES.SIGNUP] as const;
-export const PROTECTED_ROUTES = [ROUTES.DASHBOARD] as const;
+export const PROTECTED_ROUTES = [ROUTES.CHATS] as const;
 
 /**
  * Check if a pathname is a protected route

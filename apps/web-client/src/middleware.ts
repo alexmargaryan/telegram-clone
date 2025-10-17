@@ -58,9 +58,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // If accessing auth routes while having tokens, redirect to dashboard
+  // If accessing auth routes while having tokens, redirect to chats
   if (isAuth && (accessToken || refreshToken)) {
-    return NextResponse.redirect(new URL(ROUTES.DASHBOARD, request.url));
+    return NextResponse.redirect(new URL(ROUTES.CHATS, request.url));
   }
 
   return NextResponse.next();
