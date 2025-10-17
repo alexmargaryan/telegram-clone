@@ -17,6 +17,7 @@ import { CurrentUser } from "./decorators/current-user.decorator";
 import { Public } from "./decorators/public.decorator";
 import { SigninDto, SignupDto } from "./dto/signin.dto";
 import { GoogleAuthGuard } from "./google/google-auth.guard";
+import { parseStringToTime } from "./helpers/auth.helpers";
 import { JwtTokenService } from "./jwt-token/jwt-token.service";
 import { RefreshJwtAuthGuard } from "./jwt/refresh-jwt-auth.guard";
 
@@ -36,17 +37,16 @@ export class AuthController {
   ) {
     const { accessToken, refreshToken } = await this.authService.signin(dto);
 
-    // TODO: create and use a function for setting a maxAge
     response.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      maxAge: 1 * 60 * 1000, // 1 minute
+      maxAge: parseStringToTime(this.apiConfigService.accessTokenExpiresIn),
     });
 
     response.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      maxAge: 5 * 60 * 1000, // 5 minutes
+      maxAge: parseStringToTime(this.apiConfigService.refreshTokenExpiresIn),
     });
   }
 
@@ -61,13 +61,13 @@ export class AuthController {
     response.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      maxAge: 1 * 60 * 1000, // 1 minute
+      maxAge: parseStringToTime(this.apiConfigService.accessTokenExpiresIn),
     });
 
     response.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      maxAge: 5 * 60 * 1000, // 5 minutes
+      maxAge: parseStringToTime(this.apiConfigService.refreshTokenExpiresIn),
     });
   }
 
@@ -90,17 +90,16 @@ export class AuthController {
   ) {
     const response = await this.authService.googleLogin(userId);
 
-    // Set cookies instead of URL parameters
     res.cookie("accessToken", response.accessToken, {
       httpOnly: true,
       secure: true,
-      maxAge: 1 * 60 * 1000, // 1 minute
+      maxAge: parseStringToTime(this.apiConfigService.accessTokenExpiresIn),
     });
 
     res.cookie("refreshToken", response.refreshToken, {
       httpOnly: true,
       secure: true,
-      maxAge: 5 * 60 * 1000, // 5 minutes
+      maxAge: parseStringToTime(this.apiConfigService.refreshTokenExpiresIn),
     });
 
     res.redirect(this.apiConfigService.webClientUrl);
@@ -119,13 +118,13 @@ export class AuthController {
     response.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      maxAge: 1 * 60 * 1000, // 1 minute
+      maxAge: parseStringToTime(this.apiConfigService.accessTokenExpiresIn),
     });
 
     response.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      maxAge: 5 * 60 * 1000, // 5 minutes
+      maxAge: parseStringToTime(this.apiConfigService.refreshTokenExpiresIn),
     });
   }
 
@@ -143,7 +142,7 @@ export class AuthController {
     if (refreshToken) {
       const decoded = this.jwtTokenService.decodeToken(refreshToken);
       const userId = decoded.sub;
-      console.log("decoded ---->", decoded);
+
       await this.authService.logOut(userId);
     }
 

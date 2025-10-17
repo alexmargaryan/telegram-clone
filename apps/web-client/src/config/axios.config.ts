@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosError } from "axios";
 
-import { authControllerLogout } from "@/api/generated/queries";
 import { ApiError } from "@/api/types";
 import { baseURL } from "@/constants/common";
+import { logout } from "@/lib/logout";
 import { refreshTokenService } from "@/lib/refreshToken";
 
 const axios_instance = axios.create({
@@ -35,15 +35,19 @@ axios_instance.interceptors.response.use(
         originalRequest._retry = true;
 
         try {
-          await refreshTokenService.refreshToken();
+          const { status } = await refreshTokenService.refreshToken();
 
           // Retry the original request with the new token
+          if (status === "failed") {
+            throw new Error("Refresh token failed");
+          }
+
           return axios_instance(originalRequest);
         } catch (refreshError) {
           // If refresh fails, logout and redirect to signin screen
 
           try {
-            await authControllerLogout();
+            await logout();
           } catch (error) {
             console.error(error);
           } finally {
